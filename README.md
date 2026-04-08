@@ -37,7 +37,7 @@ git clone https://github.com/mariannamori2006/app-inventario.git
 python -m venv venv 
 
 # Activar entorno virtual
-v\Scripts\activate
+venv\Scripts\activate
 
 # Desactivar entorno virtual
 deactivate
