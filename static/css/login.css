@@ -1,0 +1,127 @@
+/* Estilos Globales: Fondo oscuro y tipografía moderna */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #0d1117; /* Fondo ultra oscuro */
+    color: #c9d1d9; /* Texto claro pero no blanco puro */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden; /* Evita barras de desplazamiento */
+}
+
+/* Contenedor Principal: La tarjeta de login */
+.login-container {
+    background: rgba(22, 27, 34, 0.8); /* Fondo semi-transparente */
+    padding: 40px;
+    border-radius: 20px;
+    border: 1px solid #30363d; /* Borde sutil */
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5); /* Sombra base para dar profundidad */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Efecto interactivo al pasar el mouse por la tarjeta */
+.login-container:hover {
+    transform: translateY(-5px); /* Se levanta ligeramente */
+    box-shadow: 0 15px 35px rgba(0,0,0,0.7), 0 0 15px rgba(0, 123, 255, 0.2); /* Sombra más fuerte y un ligero brillo azul */
+}
+
+/* Encabezado: Título y subtítulo */
+.login-header h2 {
+    text-align: center;
+    color: #58a6ff; /* Azul neón */
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    text-shadow: 0 0 10px rgba(88, 166, 255, 0.5); /* Brillo en el texto */
+}
+
+.login-header p {
+    text-align: center;
+    color: #8b949e;
+    font-size: 1rem;
+    margin-bottom: 30px;
+}
+
+/* Mensajes Flash: Alertas de error */
+.flash-messages {
+    margin-bottom: 20px;
+}
+
+.alert {
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.alert-danger {
+    background-color: rgba(248, 81, 73, 0.15);
+    color: #f85149;
+    border: 1px solid rgba(248, 81, 73, 0.4);
+}
+
+/* Formulario y Campos de Entrada */
+.login-form .input-group {
+    margin-bottom: 20px;
+}
+
+.login-form label {
+    display: block;
+    color: #c9d1d9;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 12px 15px;
+    background-color: #0d1117; /* Fondo del input igual que el body */
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    color: #c9d1d9;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+/* Efecto al hacer clic o focus en un input */
+.login-form input:focus {
+    outline: none;
+    border-color: #58a6ff; /* Borde azul neón */
+    box-shadow: 0 0 10px rgba(88, 166, 255, 0.3); /* Brillo azul */
+    background-color: #161b22; /* Fondo ligeramente más claro al escribir */
+}
+
+/* Botón de Iniciar Sesión */
+.btn-login {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); /* Gradiente azul */
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+/* Efectos interactivos del botón */
+.btn-login:hover {
+    background: linear-gradient(135deg, #0056b3 0%, #007bff 100%); /* Gradiente invertido */
+    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.5); /* Sombra azul intensa */
+    transform: scale(1.02); /* Se agranda imperceptiblemente */
+}
+
+.btn-login:active {
+    transform: scale(0.98); /* Se hunde al hacer clic */
+}

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaInventy | Gestión Inteligente</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/mi-logo.png') }}">
+</head>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-circle">
+                    <img src="{{ url_for('static', filename='img/mi-logo.png') }}" alt="Logo NovaInventy" class="logo-img">
+                </div>
+                <div class="logo-text">
+                    <h1>NovaInvent</h1>
+                    <span>Inventory AI v2.0</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li onclick="mostrarSeccion('dashboard')" id="nav-dashboard" class="nav-item active">
+                        <i class="fa-solid fa-chart-line"></i> <span>Resumen IA</span>
+                    </li>
+                    <li onclick="mostrarSeccion('categorias')" id="nav-categorias" class="nav-item">
+                        <i class="fa-solid fa-tags"></i> <span>Categorías</span>
+                    </li>
+                    <li onclick="mostrarSeccion('productos')" id="nav-productos" class="nav-item">
+                        <i class="fa-solid fa-boxes-stacked"></i> <span>Registrar Producto</span>
+                    </li>
+                    <li onclick="mostrarSeccion('catalogo')" id="nav-catalogo" class="nav-item">
+                        <i class="fa-solid fa-boxes-stacked"></i> <span>Catálogo Total</span>
+                    </li>
+                    <li onclick="mostrarSeccion('ventas')" id="nav-ventas" class="nav-item">
+                        <i class="fa-solid fa-cart-shopping"></i> <span>Punto de Venta</span>
+                    </li>
+                    <li onclick="mostrarSeccion('reportes')" id="nav-reportes" class="nav-item">
+                        <i class="fa-solid fa-chart-pie"></i> <span>Analítica de Ventas</span>
+                    </li>
+                    {% if session['rol'] == 'Jefe' %}
+                    <li onclick="mostrarSeccion('personal')" id="nav-personal" class="nav-item">
+                        <i class="fa-solid fa-users-gear"></i> <span>Gestión Personal</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer" style="display: flex; align-items: center; justify-content: space-between; padding: 20px; border-top: 1px solid var(--border-color);">
+                
+                <div class="user-info" style="display: flex; align-items: center; gap: 12px; text-align: left;">
+                    <i class="fa-solid fa-user-tie user-icon" style="font-size: 1.5rem; color: #58a6ff;"></i>
+                    <div class="user-details" style="display: flex; flex-direction: column;">
+                        <span class="user-role" style="font-size: 0.75rem; color: #8b949e; font-weight: 500;">{{ session['rol'] }}</span>
+                        
+                        <span class="user-name" style="font-size: 0.9rem; font-weight: bold; color: #c9d1d9;">{{ nombre_jefe }}</span>
+                    </div>
+                </div>
+
+                <a href="{{ url_for('usuarios.logout') }}" class="logout-btn" title="Cerrar Sesión" style="color: #f85149; text-decoration: none; font-size: 1.3rem; padding: 5px;">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </a>
+            </div>
+            </aside>
+
+        <main class="main-content">
+            
+            <section id="sec-dashboard" class="seccion-activa">
+                <div class="section-header">
+                    <div>
+                        <h2>Panel Predictivo</h2>
+                        <p>Análisis de stock basado en ritmo de ventas</p>
+                    </div>
+                    <button onclick="ejecutarIA()" class="btn-ia-glow">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Ejecutar IA
+                    </button>
+                </div>
+                <div id="msgIA"></div>
+                <div class="grid-ia" id="contenedorTarjetasIA">
+                    </div>
+            </section>
+
+            <section id="sec-categorias" style="display:none;">
+                <div class="section-header">
+                    <h2>Gestión de Categorías</h2>
+                </div>
+                <div class="card">
+                    <form id="formCategoria">
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-folder-plus"></i> Nueva Categoría</label>
+                            <input type="text" name="nombre" placeholder="Ej: Seguridad, Redes, Alarmas..." required>
+                        </div>
+                        <button type="submit" class="btn-submit">Registrar Categoría</button>
+                    </form>
+                </div>
+                <div id="msgCategoria"></div>
+            </section>
+
+            <section id="sec-productos" style="display:none;">
+                <div class="section-header">
+                    <h2>Añadir Producto al Inventario</h2>
+                </div>
+                <div class="card">
+                    <form id="formProducto">
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label>Categoría</label>
+                                <select name="id_categoria" id="selectCategoria" required>
+                                    <option value="">Cargando categorías...</option>
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>Nombre del Producto</label>
+                                <input type="text" name="nombre" placeholder="Nombre completo del equipo" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Stock Inicial</label>
+                                <input type="number" name="stock" value="0" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Precio Compra (S/)</label>
+                                <input type="number" step="0.01" name="precio_compra" placeholder="0.00" min="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Precio Venta (S/)</label>
+                                <input type="number" step="0.01" name="precio_venta" placeholder="0.00" min="0.01" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-submit">Guardar en Inventario</button>
+                    </form>
+                </div>
+                <div id="msgProducto"></div>
+            </section>
+
+            <section id="sec-catalogo" style="display:none;">
+                <div class="section-header">
+                    <div>
+                        <h2>Catálogo de Equipos</h2>
+                        <p>Consulta y administra el inventario completo</p>
+                    </div>
+                </div>
+
+                <div class="card mb-20">
+                    <div class="search-container">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="buscarCatalogo" placeholder="Buscar por nombre o código de producto..." oninput="filtrarCatalogo()">
+                    </div>
+                </div>
+
+                <div id="contenedor-catalogo" class="catalogo-grid">
+                    </div>
+            </section>
+
+            <section id="sec-ventas" style="display:none;">
+                <div class="section-header">
+                    <h2>Módulo de Ventas</h2>
+                </div>
+                
+                <div class="pos-wrapper">
+                    <div class="card">
+                        <form id="formVenta">
+                            <div class="form-group buscador-container">
+                                <label><i class="fa-solid fa-magnifying-glass"></i> Buscar Producto</label>
+                                <input type="text" id="pos_buscador" placeholder="Escribe nombre o código..." autocomplete="off">
+                                <div id="pos_resultados" class="dropdown-resultados"></div>
+                                <input type="hidden" id="pos_id_producto" name="id_producto" required>
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Precio Unitario</label>
+                                    <div class="input-readonly">
+                                        S/ <input type="number" id="pos_precio" name="precio" readonly required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Cantidad</label>
+                                    <input type="number" id="pos_cantidad" name="cantidad" value="1" min="1" required>
+                                </div>
+                            </div>
+
+                            <div class="pago-caja">
+                                <div class="total-display">
+                                    <span>TOTAL A PAGAR</span>
+                                    <h3 id="pos_total">S/ 0.00</h3>
+                                </div>
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>Efectivo Recibido</label>
+                                        <input type="number" id="pos_pagado" step="0.01" placeholder="0.00">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Vuelto</label>
+                                        <input type="text" id="pos_vuelto" class="vuelto-highlight" readonly placeholder="S/ 0.00">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-vender">
+                                <i class="fa-solid fa-check-to-slot"></i> Finalizar Venta
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div id="msgVenta"></div>
+            </section>
+
+            <section id="sec-reportes" style="display:none;">
+                <div class="section-header">
+                    <div>
+                        <h2>Analítica de Ventas</h2>
+                        <p>Rendimiento financiero en tiempo real</p>
+                    </div>
+                </div>
+
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon"><i class="fa-solid fa-wallet"></i></div>
+                        <div class="kpi-info">
+                            <span>Ingresos Totales (Mes)</span>
+                            <h3 id="kpi-ingresos">S/ ---</h3> 
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                            <i class="fa-solid fa-cart-arrow-down"></i>
+                        </div>
+                        <div class="kpi-info">
+                            <span>Ventas (Hoy)</span>
+                            <h3 id="kpi-ventas">---</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-20">
+                    <div class="chart-header" style="margin-bottom: 15px;">
+                        <h3 style="font-size: 16px;">Flujo de Ingresos</h3>
+                    </div>
+                    <canvas id="ventasChart" height="80"></canvas> 
+                </div>
+
+                <div class="card mt-20">
+                    <div class="chart-header" style="margin-bottom: 15px;">
+                        <h3 style="font-size: 16px;">Transacciones Recientes</h3>
+                    </div>
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Producto / Código</th>
+                                <th>Cantidad</th>
+                                <th>Total (S/)</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-transacciones"></tbody>
+                    </table>
+                </div>
+            </section>
+            <section id="sec-personal" style="display:none;">
+                <div class="section-header">
+                    <h2>Gestión de Personal</h2>
+                    <p>Registra nuevos colaboradores y asígnales un nivel de acceso</p>
+                </div>
+                <div class="card">
+                    <form id="formRegistroUsuario">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Nombre Real</label>
+                                <input type="text" name="nombre" placeholder="Nombre y Apellido" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Nombre de Usuario (Login)</label>
+                                <input type="text" name="username" placeholder="ej: jhanok_admin" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Contraseña</label>
+                                <input type="password" name="password" placeholder="********" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Rol / Rango</label>
+                                <select name="rol" required>
+                                    <option value="Vendedor">Vendedor (Básico)</option>
+                                    <option value="Administrador">Administrador (Operativo)</option>
+                                    <option value="Jefe">Jefe (Control Total)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-submit">Crear Cuenta de Acceso</button>
+                    </form>
+                </div>
+                <div id="msgRegistro"></div>
+                <div class="card mt-20">
+                    <div class="chart-header" style="margin-bottom: 15px;">
+                        <h3>Lista de Personal Activo</h3>
+                    </div>
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Usuario</th>
+                                <th>Cargo / Rango</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-usuarios">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div> <div id="modalProducto" class="modal">
+        <div class="modal-content card">
+            <div class="modal-header">
+                <h2 id="modalTitulo">Detalles del Equipo</h2>
+                <span class="close-modal" onclick="cerrarModal()">&times;</span>
+            </div>
+            
+            <form id="formEdicionRapida">
+                <input type="hidden" id="edit_id">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Nombre del Producto</label>
+                        <input type="text" id="edit_nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Categoría</label>
+                        <select id="edit_categoria" required>
+                            </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Stock Actual</label>
+                        <input type="number" id="edit_stock" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Precio Compra (S/)</label>
+                        <input type="number" step="0.01" id="edit_p_compra">
+                    </div>
+                    <div class="form-group">
+                        <label>Precio Venta (S/)</label>
+                        <input type="number" step="0.01" id="edit_p_venta">
+                    </div>
+                </div>
+                
+                <div id="btnContenedorEdicion" style="margin-top: 20px;">
+                    </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    
+    <script>
+        window.onclick = function(event) {
+            let modal = document.getElementById("modalProducto");
+            if (event.target == modal) {
+                cerrarModal();
+            }
+        }
+        function cerrarModal() {
+            document.getElementById("modalProducto").style.display = "none";
+        }
+    </script>
+
+</body>
+</html>
