@@ -17,7 +17,7 @@ Sistema web que utiliza inteligencia artificial para predecir ventas y calcular 
 
 - Punto de Venta (POS): Buscador predictivo, cálculo automático de vueltos y actualización de stock en tiempo real.
 
--Dashboard Web3: Interfaz moderna y responsive con estados visuales de stock (Crítico, Reabastecer, OK).
+- Dashboard Web3: Interfaz moderna y responsive con estados visuales de stock (Crítico, Reabastecer, OK).
 
 ## Funcionalidades
 - Predicción de ventas mediante regresión lineal
