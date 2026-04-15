@@ -57,13 +57,23 @@ INSERT INTO categorias (id, nombre) VALUES
 (1, 'Electrónica'),
 (2, 'Accesorios');
 
--- Usuarios Mariana aqui las contraseñas son admin123 de ti, oscar y de mi y norris123 de lando y perez123 de sergio xd lo sale asi porque estan codificadas :)
+-- Usuarios Mariana aqui las contraseñas son admin123 de todos  :)
+--esto desactivara las claves foraneas pero si no quieres
+-- puedes solamente borrar todo el script y crea uno desde 0 con DROP DATABASE InventarioIA;
+SET FOREIGN_KEY_CHECKS = 0; 
+
+
+TRUNCATE TABLE operaciones;
+TRUNCATE TABLE usuarios;
+
+SET FOREIGN_KEY_CHECKS = 1; -- esto las activa de nuevo
+
 INSERT INTO usuarios (id, nombre, username, password, rol, estado, fecha_creacion) VALUES 
-(1, 'Jhanok Leon', 'jhanok_jefe', 'scrypt:32768:8:1$Kcx0w8WI32AwU5CR$ed3e75871b695780598816f199042b08332145e39660233088b939527ecb822c954a6316279930f78f85f341b80f1464455589a19c6298e3b48f6540b6e9273c', 'Jefe', 'Activo', '2026-04-12 18:50:17'),
-(2, 'Marianna Mori', 'Mari_jefe', 'scrypt:32768:8:1$sdRkU0C3nwzDwePG$c75fe9871b695780598816f199042b08332145e39660233088b939527ecb822c954a6316279930f78f85f341b80f1464455589a19c6298e3b48f6540b6e9273c', 'Jefe', 'Activo', '2026-04-14 17:12:56'),
-(3, 'Oscar Piastri', 'oscar_admin', 'scrypt:32768:8:1$uSAJ5VLhbiOjSDHh$e333f8b3c94f57c858e38d789061099e078028776610787e9c5e3f4e3c3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f', 'Administrador', 'Activo', '2026-04-13 00:34:13'),
-(4, 'Lando Norris', 'norris_admin', 'scrypt:32768:8:1$fNUxtDKmXVJmC5tR$9365ea6216a69874e40283789061099e078028776610787e9c5e3f4e3c3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f', 'Administrador', 'Activo', '2026-04-13 01:04:34'),
-(5, 'Sergio Perez', 'perez_vendedor', 'scrypt:32768:8:1$qvJ7wAlRKFe6mwzk$414fba0f21469e3a6c17f16f393d254b83b9c7924d623230a133f9154f2427a9296e832962257d298f65879a95393962657876a91c12e841804108876c12e5f5', 'Vendedor', 'Activo', '2026-04-12 21:56:44');
+(1, 'Jhanok Leon', 'jhanok_jefe', 'scrypt:32768:8:1$sdRkU0C3nwzDwePG$c75fe6945af111e5afc9f7bdf10c4eaa59725e29687c634a7988c5dd3125589d80a7a86d28a158094adc2a32d5a78b988eab0fa94c7b9d30062213a4f1059618', 'Jefe', 'Activo', NOW()),
+(2, 'Marianna Mori', 'mari_jefe', 'scrypt:32768:8:1$sdRkU0C3nwzDwePG$c75fe6945af111e5afc9f7bdf10c4eaa59725e29687c634a7988c5dd3125589d80a7a86d28a158094adc2a32d5a78b988eab0fa94c7b9d30062213a4f1059618', 'Jefe', 'Activo', NOW()),
+(3, 'Oscar Piastri', 'oscar_admin', 'scrypt:32768:8:1$sdRkU0C3nwzDwePG$c75fe6945af111e5afc9f7bdf10c4eaa59725e29687c634a7988c5dd3125589d80a7a86d28a158094adc2a32d5a78b988eab0fa94c7b9d30062213a4f1059618', 'Administrador', 'Activo', NOW()),
+(4, 'Lando Norris', 'lando_admin', 'scrypt:32768:8:1$sdRkU0C3nwzDwePG$c75fe6945af111e5afc9f7bdf10c4eaa59725e29687c634a7988c5dd3125589d80a7a86d28a158094adc2a32d5a78b988eab0fa94c7b9d30062213a4f1059618', 'Administrador', 'Activo', NOW()),
+(5, 'Sergio Perez', 'checo_vendedor', 'scrypt:32768:8:1$sdRkU0C3nwzDwePG$c75fe6945af111e5afc9f7bdf10c4eaa59725e29687c634a7988c5dd3125589d80a7a86d28a158094adc2a32d5a78b988eab0fa94c7b9d30062213a4f1059618', 'Vendedor', 'Activo', NOW());
 
 -- Productos
 INSERT INTO productos (id, codigo, nombre, id_categoria, precio_compra, precio_venta, stock_actual, stock_minimo, fecha_registro) VALUES 
