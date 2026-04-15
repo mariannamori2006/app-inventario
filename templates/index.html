@@ -30,28 +30,35 @@
 
             <nav class="sidebar-nav">
                 <ul>
-                    <li onclick="mostrarSeccion('dashboard')" id="nav-dashboard" class="nav-item active">
-                        <i class="fa-solid fa-chart-line"></i> <span>Resumen IA</span>
-                    </li>
-                    <li onclick="mostrarSeccion('categorias')" id="nav-categorias" class="nav-item">
-                        <i class="fa-solid fa-tags"></i> <span>Categorías</span>
-                    </li>
-                    <li onclick="mostrarSeccion('productos')" id="nav-productos" class="nav-item">
-                        <i class="fa-solid fa-boxes-stacked"></i> <span>Registrar Producto</span>
-                    </li>
+                    {% if session['rol'] in ['Jefe', 'Administrador'] %}
+                        <li onclick="mostrarSeccion('dashboard')" id="nav-dashboard" class="nav-item active">
+                            <i class="fa-solid fa-chart-line"></i> <span>Resumen IA</span>
+                        </li>
+                        <li onclick="mostrarSeccion('categorias')" id="nav-categorias" class="nav-item">
+                            <i class="fa-solid fa-tags"></i> <span>Categorías</span>
+                        </li>
+                        <li onclick="mostrarSeccion('productos')" id="nav-productos" class="nav-item">
+                            <i class="fa-solid fa-boxes-stacked"></i> <span>Registrar Producto</span>
+                        </li>
+                    {% endif %}
+
                     <li onclick="mostrarSeccion('catalogo')" id="nav-catalogo" class="nav-item">
-                        <i class="fa-solid fa-boxes-stacked"></i> <span>Catálogo Total</span>
+                        <i class="fa-solid fa-layer-group"></i> <span>Catálogo Total</span>
                     </li>
                     <li onclick="mostrarSeccion('ventas')" id="nav-ventas" class="nav-item">
                         <i class="fa-solid fa-cart-shopping"></i> <span>Punto de Venta</span>
                     </li>
-                    <li onclick="mostrarSeccion('reportes')" id="nav-reportes" class="nav-item">
-                        <i class="fa-solid fa-chart-pie"></i> <span>Analítica de Ventas</span>
-                    </li>
+
                     {% if session['rol'] == 'Jefe' %}
-                    <li onclick="mostrarSeccion('personal')" id="nav-personal" class="nav-item">
-                        <i class="fa-solid fa-users-gear"></i> <span>Gestión Personal</span>
-                    </li>
+                        <li onclick="mostrarSeccion('reportes')" id="nav-reportes" class="nav-item">
+                            <i class="fa-solid fa-chart-pie"></i> <span>Analítica de Ventas</span>
+                        </li>
+                        <li onclick="mostrarSeccion('operaciones')" id="nav-operaciones" class="nav-item">
+                            <i class="fa-solid fa-clock-rotate-left"></i> <span>Operaciones</span>
+                        </li>
+                        <li onclick="mostrarSeccion('personal')" id="nav-personal" class="nav-item">
+                            <i class="fa-solid fa-users-gear"></i> <span>Gestión Personal</span>
+                        </li>
                     {% endif %}
                 </ul>
             </nav>
@@ -315,6 +322,30 @@
                             </tr>
                         </thead>
                         <tbody id="tabla-usuarios">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="sec-operaciones" style="display:none;">
+                <div class="section-header">
+                    <div>
+                        <h2>Historial de Operaciones</h2>
+                        <p>Monitoreo de seguridad y acciones del personal en NovaInventy</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha y Hora</th>
+                                <th>Personal</th>
+                                <th>Módulo</th>
+                                <th>Acción Realizada</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-operaciones-body">
                             </tbody>
                     </table>
                 </div>

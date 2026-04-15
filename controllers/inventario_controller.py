@@ -7,6 +7,7 @@ from models.inventario_model import (
     registrar_venta_db, obtener_analitica,
     actualizar_producto_db, eliminar_producto_db
 )
+from models.usuario_model import registrar_operacion # <--- El Notario
 from ai.prediccion import analizar_ventas_ia
 
 inventario_bp = Blueprint('inventario', __name__)
@@ -23,9 +24,15 @@ def gestionar_categorias():
     if request.method == 'POST':
         if session.get('rol') not in ['Jefe', 'Administrador']:
             return jsonify({"status": "error", "message": "No tienes permiso para crear categorías"}), 403
+        
         data = request.json
         exito, mensaje = guardar_categoria(data['nombre'])
+        
+        if exito:
+            registrar_operacion(session['user_id'], f"Creó categoría: {data['nombre']}", "CATEGORIAS")
+            
         return jsonify({"status": "success" if exito else "error", "message": mensaje})
+    
     return jsonify({"status": "success", "data": obtener_categorias()})
 
 # --- RUTAS DE PRODUCTOS ---
@@ -34,12 +41,18 @@ def gestionar_productos():
     if request.method == 'POST':
         if session.get('rol') not in ['Jefe', 'Administrador']:
             return jsonify({"status": "error", "message": "No autorizado"}), 403
+        
         data = request.json
         exito, mensaje = guardar_producto(
             data.get('codigo'), data['nombre'], data['id_categoria'], 
             data['precio_compra'], data['precio_venta'], data['stock']
         )
+        
+        if exito:
+            registrar_operacion(session['user_id'], f"Registró producto: {data['nombre']}", "INVENTARIO")
+            
         return jsonify({"status": "success" if exito else "error", "message": mensaje})
+    
     return jsonify({"status": "success", "data": obtener_productos()})
 
 # --- NUEVA RUTA: EDITAR PRODUCTO (ADMIN Y JEFE) ---
@@ -49,12 +62,14 @@ def editar_producto(id_prod):
         return jsonify({"status": "error", "message": "Acceso denegado"}), 403
     
     data = request.json
-    # Python procesa la actualización. 
-    # La lógica de "qué campos se envían" ya la controlamos en el script.js según el rol.
     exito, mensaje = actualizar_producto_db(
         id_prod, data['nombre'], data['id_categoria'], 
         data['precio_compra'], data['precio_venta'], data['stock']
     )
+    
+    if exito:
+        registrar_operacion(session['user_id'], f"Editó producto ID {id_prod}: {data['nombre']}", "INVENTARIO")
+        
     return jsonify({"status": "success" if exito else "error", "message": mensaje})
 
 # --- NUEVA RUTA: ELIMINAR PRODUCTO (SOLO JEFE) ---
@@ -64,6 +79,10 @@ def eliminar_producto(id_prod):
         return jsonify({"status": "error", "message": "¡Solo el Jefe puede eliminar equipos permanentemente!"}), 403
     
     exito, mensaje = eliminar_producto_db(id_prod)
+    
+    if exito:
+        registrar_operacion(session['user_id'], f"ELIMINÓ producto ID {id_prod}", "INVENTARIO")
+        
     return jsonify({"status": "success" if exito else "error", "message": mensaje})
 
 # --- RUTAS DE VENTAS Y ANALÍTICA ---
@@ -71,6 +90,10 @@ def eliminar_producto(id_prod):
 def registrar_venta():
     data = request.json
     exito, mensaje = registrar_venta_db(data['id_producto'], data['cantidad'], data['precio'])
+    
+    if exito:
+        registrar_operacion(session['user_id'], f"Realizó venta (ID Prod: {data['id_producto']} - Cant: {data['cantidad']})", "VENTAS")
+        
     return jsonify({"status": "success" if exito else "error", "message": mensaje})
 
 @inventario_bp.route('/api/reportes', methods=['GET'])

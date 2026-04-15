@@ -76,3 +76,25 @@ def cambiar_estado_usuario(user_id, nuevo_estado):
     finally:
         cursor.close()
         conn.close()
+
+
+def registrar_operacion(id_usuario, accion, modulo):
+    """Escribe un registro en la tabla de auditoría (operaciones)"""
+    conn = get_db_connection()
+    if not conn: return False
+    
+    cursor = conn.cursor()
+    try:
+        query = """
+            INSERT INTO operaciones (id_usuario, accion, modulo) 
+            VALUES (%s, %s, %s)
+        """
+        cursor.execute(query, (id_usuario, accion, modulo))
+        conn.commit()
+        return True
+    except Exception as e:
+        print(f"Error al registrar operación: {e}")
+        return False
+    finally:
+        cursor.close()
+        conn.close()
