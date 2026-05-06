@@ -408,28 +408,182 @@ function dibujarGrafico(datosDias) {
 // ================== INTELIGENCIA ARTIFICIAL ==================
 window.ejecutarIA = async function() {
     const btn = document.querySelector('.btn-ia-glow');
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Procesando...';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analizando...';
     btn.disabled = true;
+
     try {
         const res = await fetch('/api/ia/prediccion');
         const result = await res.json();
         const contenedor = document.getElementById('contenedorTarjetasIA');
         contenedor.innerHTML = '';
-        if(result.status === 'info' || result.status === 'error') {
+
+        if (result.status !== 'success') {
             mostrarMensaje('msgIA', result.status, result.message);
-        } else {
-            result.data.forEach(p => {
-                let clase = p.alerta === 'CRÍTICO' ? 'alerta-critico' : (p.alerta === 'REABASTECER' ? 'alerta-reabastecer' : 'alerta-ok');
-                contenedor.innerHTML += `
-                    <div class="tarjeta-ia ${clase}">
-                        <h3>${p.producto}</h3>
-                        <p>Stock: ${p.stock} | Ritmo: ${p.ritmo_venta}/día</p>
-                        <p>Agotamiento: ${p.dias_restantes === 999 ? 'Sin datos' : p.dias_restantes + ' días'}</p>
-                    </div>`;
-            });
+            return;
         }
-    } catch (error) { mostrarMensaje('msgIA', 'error', 'Error IA'); }
-    finally { btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Ejecutar IA'; btn.disabled = false; }
+
+        result.data.forEach((p, index) => {
+            // Color del score
+            let colorScore, bgScore;
+            if (p.score_salud >= 70)      { colorScore = '#10b981'; bgScore = 'rgba(16,185,129,0.1)'; }
+            else if (p.score_salud >= 40) { colorScore = '#f59e0b'; bgScore = 'rgba(245,158,11,0.1)'; }
+            else                          { colorScore = '#ef4444'; bgScore = 'rgba(239,68,68,0.1)'; }
+
+            // Icono de tendencia
+            const iconTendencia = {
+                'subiendo':  '<i class="fa-solid fa-arrow-trend-up" style="color:#10b981"></i>',
+                'bajando':   '<i class="fa-solid fa-arrow-trend-down" style="color:#ef4444"></i>',
+                'estable':   '<i class="fa-solid fa-minus" style="color:#94a3b8"></i>',
+                'sin datos': '<i class="fa-solid fa-question" style="color:#94a3b8"></i>',
+            }[p.tendencia] || '';
+
+            const claseAlerta = {
+                'CRITICO':    'alerta-critico',
+                'REABASTECER':'alerta-reabastecer',
+                'DORMIDO':    'alerta-dormido',
+                'OK':         'alerta-ok',
+            }[p.alerta] || '';
+
+            const badgeTendencia = p.cambio_pct !== 0
+                ? `${iconTendencia} ${p.cambio_pct > 0 ? '+' : ''}${p.cambio_pct}% vs semana anterior`
+                : `${iconTendencia} sin cambio reciente`;
+
+            // ID único para el canvas de este producto
+            const canvasId = `chart-stock-${index}`;
+            const tieneGrafico = p.proyeccion && p.proyeccion.length > 0;
+
+            contenedor.innerHTML += `
+                <div class="tarjeta-ia ${claseAlerta}" style="position:relative; overflow:hidden;">
+
+                    <div style="position:absolute; top:12px; right:12px; text-align:center;
+                                background:${bgScore}; border:1px solid ${colorScore};
+                                border-radius:50%; width:48px; height:48px;
+                                display:flex; flex-direction:column;
+                                align-items:center; justify-content:center;">
+                        <span style="font-size:14px; font-weight:700; color:${colorScore}; line-height:1">${p.score_salud}</span>
+                        <span style="font-size:9px; color:${colorScore}; opacity:.8">salud</span>
+                    </div>
+
+                    <h3 style="padding-right:60px">${p.producto}</h3>
+
+                    <div style="display:flex; gap:16px; margin:6px 0; font-size:13px;">
+                        <span><i class="fa-solid fa-boxes-stacked" style="opacity:.6"></i> Stock: <strong>${p.stock}</strong> und.</span>
+                        <span><i class="fa-solid fa-bolt" style="opacity:.6"></i> Ritmo: <strong>${p.ritmo_venta}/día</strong></span>
+                    </div>
+
+                    <p style="font-size:13px; margin:4px 0;">
+                        <i class="fa-solid fa-calendar-xmark" style="opacity:.6"></i>
+                        Quiebre estimado: <strong>${p.fecha_quiebre}</strong>
+                        ${p.dias_restantes < 999 ? `(${p.dias_restantes} días)` : ''}
+                    </p>
+
+                    <p style="font-size:12px; margin:4px 0; opacity:.85">${badgeTendencia}</p>
+
+                    <p style="font-size:12px; margin:4px 0; opacity:.85">
+                        <i class="fa-solid fa-sack-dollar" style="opacity:.6"></i>
+                        Margen: S/ ${p.margen_sol} (${p.margen_pct}%)
+                    </p>
+
+                    ${p.dormido ? `
+                        <p style="font-size:12px; color:#f59e0b; margin-top:6px;">
+                            <i class="fa-solid fa-moon"></i>
+                            Sin ventas hace ${p.dias_sin_venta ?? '30+'} días
+                        </p>` : ''}
+
+                    ${tieneGrafico ? `
+                        <div style="margin-top:14px; border-top:1px solid rgba(255,255,255,0.07); padding-top:12px;">
+                            <p style="font-size:11px; opacity:.5; margin:0 0 8px;">
+                                <i class="fa-solid fa-chart-line"></i> Proyección de stock — próximos 30 días
+                            </p>
+                            <canvas id="${canvasId}" height="60"></canvas>
+                        </div>` : ''}
+                </div>
+            `;
+        });
+
+        // Dibujar gráficos DESPUÉS de que el HTML esté en el DOM
+        result.data.forEach((p, index) => {
+            if (!p.proyeccion || p.proyeccion.length === 0) return;
+
+            const canvas = document.getElementById(`chart-stock-${index}`);
+            if (!canvas) return;
+
+            const labels  = p.proyeccion.map(d => d.fecha);
+            const valores = p.proyeccion.map(d => d.stock);
+
+            // Línea de quiebre (cuando stock llega a 0)
+            const diaQuiebre = p.proyeccion.findIndex(d => d.stock === 0);
+
+            // Color de la línea según alerta
+            const colorLinea = p.alerta === 'CRITICO' ? '#ef4444' : '#f59e0b';
+
+            new Chart(canvas.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'Stock proyectado',
+                            data: valores,
+                            borderColor: colorLinea,
+                            backgroundColor: colorLinea + '18',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            fill: true,
+                            tension: 0.3,
+                        },
+                        // Línea horizontal de stock mínimo (5 unidades)
+                        {
+                            label: 'Stock mínimo',
+                            data: Array(31).fill(5),
+                            borderColor: 'rgba(255,255,255,0.2)',
+                            borderWidth: 1,
+                            borderDash: [4, 4],
+                            pointRadius: 0,
+                            fill: false,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => `Stock: ${ctx.parsed.y} und.`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                color: '#94a3b8',
+                                font: { size: 10 },
+                                maxTicksLimit: 6  // Muestra solo ~6 fechas para no saturar
+                            }
+                        },
+                        y: {
+                            min: 0,
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: {
+                                color: '#94a3b8',
+                                font: { size: 10 },
+                                stepSize: Math.ceil(p.stock / 4)
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+    } catch (error) {
+        mostrarMensaje('msgIA', 'error', 'Error al conectar con la IA');
+    } finally {
+        btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Ejecutar IA';
+        btn.disabled = false;
+    }
 }
 
 // ================== MÓDULO: GESTIÓN DE PERSONAL ==================

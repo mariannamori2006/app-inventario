@@ -120,7 +120,7 @@ def obtener_analitica():
             SELECT SUM(v.cantidad * p.precio_venta) as total 
             FROM ventas v
             JOIN productos p ON v.id_producto = p.id
-            WHERE MONTH(v.fecha_venta) = MONTH(CURRENT_DATE()) AND YEAR(v.fecha_venta) = YEAR(CURRENT_DATE())
+            WHERE v.fecha_venta >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
         """)
         res_mes = cursor.fetchone()
         reporte['ingresos_mes'] = res_mes['total'] if res_mes['total'] else 0
@@ -133,7 +133,7 @@ def obtener_analitica():
             SELECT DATE_FORMAT(v.fecha_venta, '%d/%m') as fecha, SUM(v.cantidad * p.precio_venta) as total
             FROM ventas v
             JOIN productos p ON v.id_producto = p.id
-            WHERE v.fecha_venta >= DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY)
+            WHERE v.fecha_venta >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
             GROUP BY DATE(v.fecha_venta)
             ORDER BY v.fecha_venta ASC
         """)

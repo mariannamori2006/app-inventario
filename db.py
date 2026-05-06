@@ -10,7 +10,7 @@ def get_db_connection():
         connection = mysql.connector.connect(
             host='localhost',      # Servidor local
             user='root',           # Usuario por defecto de XAMPP
-            password='',           # Contraseña por defecto (vía vacía)
+            password='sasa',           # Contraseña por defecto (vía vacía)
             database='InventarioIA' # El nombre exacto de tu BD en el SQL
         )
 
