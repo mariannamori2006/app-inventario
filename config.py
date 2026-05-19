@@ -5,8 +5,9 @@ def get_db_connection():
         conexion = mysql.connector.connect(
             host="localhost",
             user="root",      # Usuario por defecto de XAMPP
-            password="sasa",      # Contraseña por defecto (vacía)
-            database="InventarioIA"
+            password="",      # Contraseña por defecto (vacía)
+            database="InventarioIA",
+            port=3307
         )
         return conexion
     except mysql.connector.Error as err:

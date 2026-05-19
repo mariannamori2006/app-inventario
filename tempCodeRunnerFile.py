@@ -1,13 +1,15 @@
-from models.usuario_model import crear_usuario_db
+import mysql.connector
 
-# Cambia estos datos por los que tú quieras
-nombre_real = "Marianna Mori"
-tu_usuario = "mari"
-tu_clave = "admin123" # Luego la podrás cambiar
-
-exito, msj = crear_usuario_db(nombre_real, tu_usuario, tu_clave, "Jefe")
-
-if exito:
-    print(f"✅ ¡Felicidades! El Jefe {nombre_real} ha sido creado.")
-else:
-    print(f"❌ Error: {msj}")
+def get_db_connection():
+    try:
+        conexion = mysql.connector.connect(
+            host="localhost",
+            user="root",      # Usuario por defecto de XAMPP
+            password="",      # Contraseña por defecto (vacía)
+            database="InventarioIA",
+            port=3307
+        )
+        return conexion
+    except mysql.connector.Error as err:
+        print(f"Error de conexión a MySQL: {err}")
+        return None
