@@ -406,6 +406,8 @@ function dibujarGrafico(datosDias) {
 }
 
 // ================== INTELIGENCIA ARTIFICIAL ==================
+let panelChart = null;
+
 window.ejecutarIA = async function() {
     const btn = document.querySelector('.btn-ia-glow');
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analizando...';
@@ -422,157 +424,80 @@ window.ejecutarIA = async function() {
             return;
         }
 
+        window.datosIA = result.data;
+
         result.data.forEach((p, index) => {
-            // Color del score
             let colorScore, bgScore;
             if (p.score_salud >= 70)      { colorScore = '#10b981'; bgScore = 'rgba(16,185,129,0.1)'; }
             else if (p.score_salud >= 40) { colorScore = '#f59e0b'; bgScore = 'rgba(245,158,11,0.1)'; }
             else                          { colorScore = '#ef4444'; bgScore = 'rgba(239,68,68,0.1)'; }
 
-            // Icono de tendencia
-            const iconTendencia = {
-                'subiendo':  '<i class="fa-solid fa-arrow-trend-up" style="color:#10b981"></i>',
-                'bajando':   '<i class="fa-solid fa-arrow-trend-down" style="color:#ef4444"></i>',
-                'estable':   '<i class="fa-solid fa-minus" style="color:#94a3b8"></i>',
-                'sin datos': '<i class="fa-solid fa-question" style="color:#94a3b8"></i>',
-            }[p.tendencia] || '';
-
             const claseAlerta = {
-                'CRITICO':    'alerta-critico',
-                'REABASTECER':'alerta-reabastecer',
-                'DORMIDO':    'alerta-dormido',
-                'OK':         'alerta-ok',
+                'CRITICO':     'alerta-critico',
+                'REABASTECER': 'alerta-reabastecer',
+                'DORMIDO':     'alerta-dormido',
+                'OK':          'alerta-ok',
             }[p.alerta] || '';
 
-            const badgeTendencia = p.cambio_pct !== 0
-                ? `${iconTendencia} ${p.cambio_pct > 0 ? '+' : ''}${p.cambio_pct}% vs semana anterior`
-                : `${iconTendencia} sin cambio reciente`;
-
-            // ID único para el canvas de este producto
-            const canvasId = `chart-stock-${index}`;
             const tieneGrafico = p.proyeccion && p.proyeccion.length > 0;
+            const canvasId = `chart-mini-${index}`;
 
             contenedor.innerHTML += `
-                <div class="tarjeta-ia ${claseAlerta}" style="position:relative; overflow:hidden;">
+                <div class="tarjeta-ia ${claseAlerta}" 
+                     onclick="abrirPanelIA(${index})"
+                     style="cursor:pointer; position:relative; padding:16px;">
 
                     <div style="position:absolute; top:12px; right:12px; text-align:center;
                                 background:${bgScore}; border:1px solid ${colorScore};
-                                border-radius:50%; width:48px; height:48px;
+                                border-radius:50%; width:44px; height:44px;
                                 display:flex; flex-direction:column;
                                 align-items:center; justify-content:center;">
-                        <span style="font-size:14px; font-weight:700; color:${colorScore}; line-height:1">${p.score_salud}</span>
-                        <span style="font-size:9px; color:${colorScore}; opacity:.8">salud</span>
+                        <span style="font-size:13px; font-weight:700; color:${colorScore}; line-height:1">${p.score_salud}</span>
+                        <span style="font-size:8px; color:${colorScore}; opacity:.8">salud</span>
                     </div>
 
-                    <h3 style="padding-right:60px">${p.producto}</h3>
+                    <h3 style="padding-right:55px; font-size:14px; margin-bottom:8px;">${p.producto}</h3>
 
-                    <div style="display:flex; gap:16px; margin:6px 0; font-size:13px;">
-                        <span><i class="fa-solid fa-boxes-stacked" style="opacity:.6"></i> Stock: <strong>${p.stock}</strong> und.</span>
-                        <span><i class="fa-solid fa-bolt" style="opacity:.6"></i> Ritmo: <strong>${p.ritmo_venta}/día</strong></span>
+                    <div style="display:flex; gap:12px; font-size:12px; opacity:.7; margin-bottom:10px;">
+                        <span><i class="fa-solid fa-boxes-stacked"></i> ${p.stock} und.</span>
+                        <span><i class="fa-solid fa-bolt"></i> ${p.ritmo_venta}/día</span>
                     </div>
-
-                    <p style="font-size:13px; margin:4px 0;">
-                        <i class="fa-solid fa-calendar-xmark" style="opacity:.6"></i>
-                        Quiebre estimado: <strong>${p.fecha_quiebre}</strong>
-                        ${p.dias_restantes < 999 ? `(${p.dias_restantes} días)` : ''}
-                    </p>
-
-                    <p style="font-size:12px; margin:4px 0; opacity:.85">${badgeTendencia}</p>
-
-                    <p style="font-size:12px; margin:4px 0; opacity:.85">
-                        <i class="fa-solid fa-sack-dollar" style="opacity:.6"></i>
-                        Margen: S/ ${p.margen_sol} (${p.margen_pct}%)
-                    </p>
-
-                    ${p.dormido ? `
-                        <p style="font-size:12px; color:#f59e0b; margin-top:6px;">
-                            <i class="fa-solid fa-moon"></i>
-                            Sin ventas hace ${p.dias_sin_venta ?? '30+'} días
-                        </p>` : ''}
 
                     ${tieneGrafico ? `
-                        <div style="margin-top:14px; border-top:1px solid rgba(255,255,255,0.07); padding-top:12px;">
-                            <p style="font-size:11px; opacity:.5; margin:0 0 8px;">
-                                <i class="fa-solid fa-chart-line"></i> Proyección de stock — próximos 30 días
-                            </p>
+                        <div style="border-top:1px solid rgba(255,255,255,0.07); padding-top:10px;">
                             <canvas id="${canvasId}" height="60"></canvas>
                         </div>` : ''}
                 </div>
             `;
         });
 
-        // Dibujar gráficos DESPUÉS de que el HTML esté en el DOM
         result.data.forEach((p, index) => {
             if (!p.proyeccion || p.proyeccion.length === 0) return;
-
-            const canvas = document.getElementById(`chart-stock-${index}`);
+            const canvas = document.getElementById(`chart-mini-${index}`);
             if (!canvas) return;
 
-            const labels  = p.proyeccion.map(d => d.fecha);
-            const valores = p.proyeccion.map(d => d.stock);
-
-            // Línea de quiebre (cuando stock llega a 0)
-            const diaQuiebre = p.proyeccion.findIndex(d => d.stock === 0);
-
-            // Color de la línea según alerta
             const colorLinea = p.alerta === 'CRITICO' ? '#ef4444' : '#f59e0b';
-
             new Chart(canvas.getContext('2d'), {
                 type: 'line',
                 data: {
-                    labels,
-                    datasets: [
-                        {
-                            label: 'Stock proyectado',
-                            data: valores,
-                            borderColor: colorLinea,
-                            backgroundColor: colorLinea + '18',
-                            borderWidth: 2,
-                            pointRadius: 0,
-                            fill: true,
-                            tension: 0.3,
-                        },
-                        // Línea horizontal de stock mínimo (5 unidades)
-                        {
-                            label: 'Stock mínimo',
-                            data: Array(31).fill(5),
-                            borderColor: 'rgba(255,255,255,0.2)',
-                            borderWidth: 1,
-                            borderDash: [4, 4],
-                            pointRadius: 0,
-                            fill: false,
-                        }
-                    ]
+                    labels: p.proyeccion.map(d => d.fecha),
+                    datasets: [{
+                        data: p.proyeccion.map(d => d.stock),
+                        borderColor: colorLinea,
+                        backgroundColor: colorLinea + '18',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: true,
+                        tension: 0.3,
+                    }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: ctx => `Stock: ${ctx.parsed.y} und.`
-                            }
-                        }
-                    },
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
                     scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: {
-                                color: '#94a3b8',
-                                font: { size: 10 },
-                                maxTicksLimit: 6  // Muestra solo ~6 fechas para no saturar
-                            }
-                        },
-                        y: {
-                            min: 0,
-                            grid: { color: 'rgba(255,255,255,0.05)' },
-                            ticks: {
-                                color: '#94a3b8',
-                                font: { size: 10 },
-                                stepSize: Math.ceil(p.stock / 4)
-                            }
-                        }
+                        x: { display: false },
+                        y: { display: false, min: 0 }
                     }
                 }
             });
@@ -584,6 +509,111 @@ window.ejecutarIA = async function() {
         btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Ejecutar IA';
         btn.disabled = false;
     }
+}
+
+window.abrirPanelIA = function(index) {
+    const p = window.datosIA[index];
+    if (!p) return;
+
+    let colorScore;
+    if (p.score_salud >= 70)      colorScore = '#10b981';
+    else if (p.score_salud >= 40) colorScore = '#f59e0b';
+    else                          colorScore = '#ef4444';
+
+    document.getElementById('panel_titulo').textContent = p.producto;
+    document.getElementById('panel_score').textContent = p.score_salud;
+    document.getElementById('panel_score').style.color = colorScore;
+    document.getElementById('panel_stock').textContent = `${p.stock} und.`;
+    document.getElementById('panel_ritmo').textContent = `${p.ritmo_venta}/día`;
+    document.getElementById('panel_dias').textContent = p.dias_restantes < 999 ? `${p.dias_restantes} días` : 'Sin datos';
+    document.getElementById('panel_margen').textContent = `S/ ${p.margen_sol} (${p.margen_pct}%)`;
+    document.getElementById('panel_quiebre').textContent = p.fecha_quiebre;
+
+    const iconTendencia = { 'subiendo': '📈', 'bajando': '📉', 'estable': '➡️' }[p.tendencia] || '❓';
+    const signo = p.cambio_pct > 0 ? '+' : '';
+    document.getElementById('panel_tendencia').textContent =
+        `${iconTendencia} ${p.tendencia} (${signo}${p.cambio_pct}% vs semana anterior)`;
+
+    const alertaConfig = {
+        'CRITICO':     { texto: '🔴 CRÍTICO — Reabastecer urgente', bg: 'rgba(239,68,68,0.15)', color: '#ef4444' },
+        'REABASTECER': { texto: '🟡 REABASTECER — Stock bajo', bg: 'rgba(245,158,11,0.15)', color: '#f59e0b' },
+        'DORMIDO':     { texto: '🌙 DORMIDO — Sin ventas recientes', bg: 'rgba(245,158,11,0.15)', color: '#f59e0b' },
+        'OK':          { texto: '🟢 OK — Stock saludable', bg: 'rgba(16,185,129,0.15)', color: '#10b981' },
+    }[p.alerta] || { texto: p.alerta, bg: 'transparent', color: '#fff' };
+
+    const alertaEl = document.getElementById('panel_alerta');
+    alertaEl.textContent = alertaConfig.texto;
+    alertaEl.style.background = alertaConfig.bg;
+    alertaEl.style.color = alertaConfig.color;
+
+    const dormidoBox = document.getElementById('panel_dormido_box');
+    if (p.dormido && p.dias_sin_venta) {
+        dormidoBox.style.display = 'block';
+        document.getElementById('panel_dormido').textContent = `Sin ventas hace ${p.dias_sin_venta} días`;
+    } else {
+        dormidoBox.style.display = 'none';
+    }
+
+    const graficoBox = document.getElementById('panel_grafico_box');
+    if (p.proyeccion && p.proyeccion.length > 0) {
+        graficoBox.style.display = 'block';
+        if (panelChart) panelChart.destroy();
+        const colorLinea = p.alerta === 'CRITICO' ? '#ef4444' : '#f59e0b';
+        panelChart = new Chart(document.getElementById('panel_chart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: p.proyeccion.map(d => d.fecha),
+                datasets: [
+                    {
+                        label: 'Stock proyectado',
+                        data: p.proyeccion.map(d => d.stock),
+                        borderColor: colorLinea,
+                        backgroundColor: colorLinea + '18',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: true,
+                        tension: 0.3,
+                    },
+                    {
+                        label: 'Stock mínimo',
+                        data: Array(31).fill(5),
+                        borderColor: 'rgba(255,255,255,0.2)',
+                        borderWidth: 1,
+                        borderDash: [4, 4],
+                        pointRadius: 0,
+                        fill: false,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: ctx => `Stock: ${ctx.parsed.y} und.` } }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 }, maxTicksLimit: 6 } },
+                    y: { min: 0, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+                }
+            }
+        });
+    } else {
+        graficoBox.style.display = 'none';
+    }
+
+    // Abrir centrado
+    document.getElementById('panelDetalleIA').style.opacity = '1';
+    document.getElementById('panelDetalleIA').style.transform = 'translate(-50%, -50%) scale(1)';
+    document.getElementById('panelDetalleIA').style.pointerEvents = 'auto';
+    document.getElementById('overlayIA').style.display = 'block';
+}
+
+window.cerrarPanelIA = function() {
+    document.getElementById('panelDetalleIA').style.opacity = '0';
+    document.getElementById('panelDetalleIA').style.transform = 'translate(-50%, -50%) scale(0.9)';
+    document.getElementById('panelDetalleIA').style.pointerEvents = 'none';
+    document.getElementById('overlayIA').style.display = 'none';
 }
 
 // ================== MÓDULO: GESTIÓN DE PERSONAL ==================
