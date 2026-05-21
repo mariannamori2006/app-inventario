@@ -8,6 +8,26 @@
             <i class="fa-solid fa-wand-magic-sparkles"></i> Ejecutar IA
         </button>
     </div>
+
     <div id="msgIA"></div>
+
+    <!-- Resumen ejecutivo -->
+    <div id="resumenEjecutivo" style="display:none; background:rgba(255,255,255,0.03); 
+         border:1px solid var(--border-color); border-radius:12px; 
+         padding:16px 20px; margin-bottom:20px;">
+    </div>
+
+    <!-- Gráfico comparativa -->
+    <div id="boxComparativa" style="background:rgba(255,255,255,0.03);
+         border:1px solid var(--border-color); border-radius:12px;
+         padding:20px; margin-bottom:20px; display:none;">
+        <p style="font-size:12px; opacity:.5; margin-bottom:12px;">
+            <i class="fa-solid fa-chart-bar"></i> Comparativa de salud por producto
+        </p>
+        <div style="height:200px; position:relative;">
+            <canvas id="chartComparativa"></canvas>
+        </div>
+    </div>
+
     <div class="grid-ia" id="contenedorTarjetasIA"></div>
 </section>
