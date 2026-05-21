@@ -214,7 +214,13 @@ function renderizarCatalogo(filtro = "") {
         contenedor.innerHTML += `
             <div class="producto-card" ${eventoClick} style="${estiloCursor}">
                 <div class="producto-badge">${p.codigo || 'S/C'}</div>
-                <div class="producto-icon"><i class="fa-solid fa-microchip"></i></div>
+                <div class="producto-icon">
+                    ${p.imagen 
+                        ? `<img src="/static/img/productos/${p.imagen}" 
+                                style="width:60px; height:60px; object-fit:cover; border-radius:8px;">`
+                        : `<i class="fa-solid fa-microchip"></i>`
+                    }
+                </div>
                 <div class="producto-info">
                     <h3>${p.nombre}</h3>
                     <div class="producto-stats">
@@ -285,6 +291,20 @@ window.abrirModalProducto = function(id) {
         btnBox.innerHTML = '<button type="submit" class="btn-submit" style="background:var(--accent-purple)">Guardar Cambios Totales</button>';
     }
 
+        // Mostrar imagen actual del producto
+    const preview = document.getElementById('preview_imagen');
+    const placeholder = document.getElementById('placeholder_imagen');
+    if (p.imagen) {
+        preview.src = `/static/img/productos/${p.imagen}`;
+        preview.style.display = 'block';
+        placeholder.style.display = 'none';
+    } else {
+        preview.style.display = 'none';
+        placeholder.style.display = 'flex';
+    }
+    document.getElementById('nombre_imagen').textContent = '';
+    document.getElementById('input_imagen').value = '';
+
     document.getElementById('modalProducto').style.display = 'block';
 }
 
@@ -315,10 +335,26 @@ document.getElementById('formEdicionRapida').addEventListener('submit', async (e
         const result = await res.json();
         
         if(result.status === 'success') {
+            // Subir imagen si se seleccionó una
+            const inputImagen = document.getElementById('input_imagen');
+            if (inputImagen.files.length > 0) {
+                const formData = new FormData();
+                formData.append('imagen', inputImagen.files[0]);
+                const resImg = await fetch(`/api/productos/imagen/${id}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const resultImg = await resImg.json();
+                if (resultImg.status === 'success') {
+                    await cargarProductosMemoria();
+                    renderizarCatalogo();
+                }
+            }
             cerrarModal();
             await cargarProductosMemoria(); 
             renderizarCatalogo(); 
             alert("✅ " + result.message);
+            
         } else {
             alert("❌ " + result.message);
         }
@@ -614,6 +650,22 @@ window.cerrarPanelIA = function() {
     document.getElementById('panelDetalleIA').style.transform = 'translate(-50%, -50%) scale(0.9)';
     document.getElementById('panelDetalleIA').style.pointerEvents = 'none';
     document.getElementById('overlayIA').style.display = 'none';
+}
+
+// Preview de imagen antes de subir
+window.previewImagen = function(input) {
+    const file = input.files[0];
+    if (!file) return;
+    document.getElementById('nombre_imagen').textContent = file.name;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const preview = document.getElementById('preview_imagen');
+        const placeholder = document.getElementById('placeholder_imagen');
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+        placeholder.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
 }
 
 // ================== MÓDULO: GESTIÓN DE PERSONAL ==================

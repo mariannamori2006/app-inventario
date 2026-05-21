@@ -1,4 +1,6 @@
 from flask import Blueprint, request, jsonify, render_template, session, redirect, url_for
+import os
+from werkzeug.utils import secure_filename
 
 # Importamos las funciones del Modelo
 from models.inventario_model import (
@@ -9,6 +11,13 @@ from models.inventario_model import (
 )
 from models.usuario_model import registrar_operacion # <--- El Notario
 from ai.prediccion import analizar_ventas_ia
+from config import get_db_connection
+
+UPLOAD_FOLDER = 'static/img/productos'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 inventario_bp = Blueprint('inventario', __name__)
 
@@ -104,3 +113,34 @@ def datos_analitica():
 @inventario_bp.route('/api/ia/prediccion', methods=['GET'])
 def ejecutar_ia():
     return jsonify(analizar_ventas_ia())
+
+@inventario_bp.route('/api/productos/imagen/<int:id_prod>', methods=['POST'])
+def subir_imagen(id_prod):
+    if session.get('rol') not in ['Jefe', 'Administrador']:
+        return jsonify({"status": "error", "message": "No autorizado"}), 403
+
+    if 'imagen' not in request.files:
+        return jsonify({"status": "error", "message": "No se envió imagen"}), 400
+
+    file = request.files['imagen']
+    if file.filename == '' or not allowed_file(file.filename):
+        return jsonify({"status": "error", "message": "Archivo no válido"}), 400
+
+    extension = file.filename.rsplit('.', 1)[1].lower()
+    filename = f"producto_{id_prod}.{extension}"
+
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+    file.save(os.path.join(UPLOAD_FOLDER, filename))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("UPDATE productos SET imagen = %s WHERE id = %s", (filename, id_prod))
+        conn.commit()
+        registrar_operacion(session['user_id'], f"Subió imagen para producto ID {id_prod}", "INVENTARIO")
+        return jsonify({"status": "success", "imagen": filename})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)})
+    finally:
+        cursor.close()
+        conn.close()
