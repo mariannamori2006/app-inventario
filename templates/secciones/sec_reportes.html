@@ -1,0 +1,52 @@
+<section id="sec-reportes" style="display:none;">
+    <div class="section-header">
+        <div>
+            <h2>Analítica de Ventas</h2>
+            <p>Rendimiento financiero en tiempo real</p>
+        </div>
+    </div>
+
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="fa-solid fa-wallet"></i></div>
+            <div class="kpi-info">
+                <span>Ingresos Totales (Mes)</span>
+                <h3 id="kpi-ingresos">S/ ---</h3> 
+            </div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success);">
+                <i class="fa-solid fa-cart-arrow-down"></i>
+            </div>
+            <div class="kpi-info">
+                <span>Ventas (Hoy)</span>
+                <h3 id="kpi-ventas">---</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-20">
+        <div class="chart-header" style="margin-bottom: 15px;">
+            <h3 style="font-size: 16px;">Flujo de Ingresos</h3>
+        </div>
+        <canvas id="ventasChart" height="80"></canvas> 
+    </div>
+
+    <div class="card mt-20">
+        <div class="chart-header" style="margin-bottom: 15px;">
+            <h3 style="font-size: 16px;">Transacciones Recientes</h3>
+        </div>
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Producto / Código</th>
+                    <th>Cantidad</th>
+                    <th>Total (S/)</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-transacciones"></tbody>
+        </table>
+    </div>
+</section>

@@ -1,0 +1,35 @@
+<section id="sec-productos" style="display:none;">
+    <div class="section-header">
+        <h2>Añadir Producto al Inventario</h2>
+    </div>
+    <div class="card">
+        <form id="formProducto">
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label>Categoría</label>
+                    <select name="id_categoria" id="selectCategoria" required>
+                        <option value="">Cargando categorías...</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <label>Nombre del Producto</label>
+                    <input type="text" name="nombre" placeholder="Nombre completo del equipo" required>
+                </div>
+                <div class="form-group">
+                    <label>Stock Inicial</label>
+                    <input type="number" name="stock" value="0" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>Precio Compra (S/)</label>
+                    <input type="number" step="0.01" name="precio_compra" placeholder="0.00" min="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Precio Venta (S/)</label>
+                    <input type="number" step="0.01" name="precio_venta" placeholder="0.00" min="0.01" required>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Guardar en Inventario</button>
+        </form>
+    </div>
+    <div id="msgProducto"></div>
+</section>

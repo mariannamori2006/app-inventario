@@ -1,0 +1,53 @@
+<section id="sec-ventas" style="display:none;">
+    <div class="section-header">
+        <h2>Módulo de Ventas</h2>
+    </div>
+    
+    <div class="pos-wrapper">
+        <div class="card">
+            <form id="formVenta">
+                <div class="form-group buscador-container">
+                    <label><i class="fa-solid fa-magnifying-glass"></i> Buscar Producto</label>
+                    <input type="text" id="pos_buscador" placeholder="Escribe nombre o código..." autocomplete="off">
+                    <div id="pos_resultados" class="dropdown-resultados"></div>
+                    <input type="hidden" id="pos_id_producto" name="id_producto" required>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Precio Unitario</label>
+                        <div class="input-readonly">
+                            S/ <input type="number" id="pos_precio" name="precio" readonly required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Cantidad</label>
+                        <input type="number" id="pos_cantidad" name="cantidad" value="1" min="1" required>
+                    </div>
+                </div>
+
+                <div class="pago-caja">
+                    <div class="total-display">
+                        <span>TOTAL A PAGAR</span>
+                        <h3 id="pos_total">S/ 0.00</h3>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Efectivo Recibido</label>
+                            <input type="number" id="pos_pagado" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label>Vuelto</label>
+                            <input type="text" id="pos_vuelto" class="vuelto-highlight" readonly placeholder="S/ 0.00">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-vender">
+                    <i class="fa-solid fa-check-to-slot"></i> Finalizar Venta
+                </button>
+            </form>
+        </div>
+    </div>
+    <div id="msgVenta"></div>
+</section>

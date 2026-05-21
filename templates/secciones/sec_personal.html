@@ -1,0 +1,52 @@
+<section id="sec-personal" style="display:none;">
+    <div class="section-header">
+        <h2>Gestión de Personal</h2>
+        <p>Registra nuevos colaboradores y asígnales un nivel de acceso</p>
+    </div>
+    <div class="card">
+        <form id="formRegistroUsuario">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Nombre Real</label>
+                    <input type="text" name="nombre" placeholder="Nombre y Apellido" required>
+                </div>
+                <div class="form-group">
+                    <label>Nombre de Usuario (Login)</label>
+                    <input type="text" name="username" placeholder="ej: jhanok_admin" required>
+                </div>
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" name="password" placeholder="********" required>
+                </div>
+                <div class="form-group">
+                    <label>Rol / Rango</label>
+                    <select name="rol" required>
+                        <option value="Vendedor">Vendedor (Básico)</option>
+                        <option value="Administrador">Administrador (Operativo)</option>
+                        <option value="Jefe">Jefe (Control Total)</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">Crear Cuenta de Acceso</button>
+        </form>
+    </div>
+    <div id="msgRegistro"></div>
+    <div class="card mt-20">
+        <div class="chart-header" style="margin-bottom: 15px;">
+            <h3>Lista de Personal Activo</h3>
+        </div>
+        <table class="modern-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Usuario</th>
+                    <th>Cargo / Rango</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-usuarios">
+                </tbody>
+        </table>
+    </div>
+</section>

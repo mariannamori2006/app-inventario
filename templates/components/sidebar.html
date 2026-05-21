@@ -1,0 +1,62 @@
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <div class="logo-circle">
+            <img src="{{ url_for('static', filename='img/mi-logo.png') }}" alt="Logo NovaInventy" class="logo-img">
+        </div>
+        <div class="logo-text">
+            <h1>NovaInvent</h1>
+            <span>Inventory AI v2.0</span>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <ul>
+            {% if session['rol'] in ['Jefe', 'Administrador'] %}
+                <li onclick="mostrarSeccion('dashboard')" id="nav-dashboard" class="nav-item active">
+                    <i class="fa-solid fa-chart-line"></i> <span>Resumen IA</span>
+                </li>
+                <li onclick="mostrarSeccion('categorias')" id="nav-categorias" class="nav-item">
+                    <i class="fa-solid fa-tags"></i> <span>Categorías</span>
+                </li>
+                <li onclick="mostrarSeccion('productos')" id="nav-productos" class="nav-item">
+                    <i class="fa-solid fa-boxes-stacked"></i> <span>Registrar Producto</span>
+                </li>
+            {% endif %}
+
+            <li onclick="mostrarSeccion('catalogo')" id="nav-catalogo" class="nav-item">
+                <i class="fa-solid fa-layer-group"></i> <span>Catálogo Total</span>
+            </li>
+            <li onclick="mostrarSeccion('ventas')" id="nav-ventas" class="nav-item">
+                <i class="fa-solid fa-cart-shopping"></i> <span>Punto de Venta</span>
+            </li>
+
+            {% if session['rol'] == 'Jefe' %}
+                <li onclick="mostrarSeccion('reportes')" id="nav-reportes" class="nav-item">
+                    <i class="fa-solid fa-chart-pie"></i> <span>Analítica de Ventas</span>
+                </li>
+                <li onclick="mostrarSeccion('operaciones')" id="nav-operaciones" class="nav-item">
+                    <i class="fa-solid fa-clock-rotate-left"></i> <span>Operaciones</span>
+                </li>
+                <li onclick="mostrarSeccion('personal')" id="nav-personal" class="nav-item">
+                    <i class="fa-solid fa-users-gear"></i> <span>Gestión Personal</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <div class="sidebar-footer" style="display: flex; align-items: center; justify-content: space-between; padding: 20px; border-top: 1px solid var(--border-color);">
+        
+        <div class="user-info" style="display: flex; align-items: center; gap: 12px; text-align: left;">
+            <i class="fa-solid fa-user-tie user-icon" style="font-size: 1.5rem; color: #58a6ff;"></i>
+            <div class="user-details" style="display: flex; flex-direction: column;">
+                <span class="user-role" style="font-size: 0.75rem; color: #8b949e; font-weight: 500;">{{ session['rol'] }}</span>
+                
+                <span class="user-name" style="font-size: 0.9rem; font-weight: bold; color: #c9d1d9;">{{ nombre_jefe }}</span>
+            </div>
+        </div>
+
+        <a href="{{ url_for('usuarios.logout') }}" class="logout-btn" title="Cerrar Sesión" style="color: #f85149; text-decoration: none; font-size: 1.3rem; padding: 5px;">
+            <i class="fa-solid fa-right-from-bracket"></i>
+        </a>
+    </div>
+</aside>
