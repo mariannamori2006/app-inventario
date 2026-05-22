@@ -6,27 +6,42 @@
     <div class="pos-wrapper">
         <div class="card">
             <form id="formVenta">
-                <div class="form-group buscador-container">
-                    <label><i class="fa-solid fa-magnifying-glass"></i> Buscar Producto</label>
-                    <input type="text" id="pos_buscador" placeholder="Escribe nombre o código..." autocomplete="off">
-                    <div id="pos_resultados" class="dropdown-resultados"></div>
-                    <input type="hidden" id="pos_id_producto" name="id_producto" required>
-                </div>
+                <div style="display: flex; gap: 20px; align-items: flex-start; wrap: nowrap;">
+                    
+                    <div style="flex: 1;">
+                        <div class="form-group buscador-container">
+                            <label><i class="fa-solid fa-magnifying-glass"></i> Buscar Producto</label>
+                            <input type="text" id="pos_buscador" placeholder="Escribe nombre o código..." autocomplete="off">
+                            <div id="pos_resultados" class="dropdown-resultados"></div>
+                            <input type="hidden" id="pos_id_producto" name="id_producto" required>
+                        </div>
 
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Precio Unitario</label>
-                        <div class="input-readonly">
-                            S/ <input type="number" id="pos_precio" name="precio" readonly required>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Precio Unitario</label>
+                                <div class="input-readonly">
+                                    S/ <input type="number" id="pos_precio" name="precio" readonly required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Cantidad</label>
+                                <input type="number" id="pos_cantidad" name="cantidad" value="1" min="1" required>
+                            </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label>Cantidad</label>
-                        <input type="number" id="pos_cantidad" name="cantidad" value="1" min="1" required>
+
+                    <div id="bloque_pos_imagen" style="width: 160px; display: none; flex-shrink: 0; text-align: center;">
+                        <div style="width: 140px; height: 140px; margin: 0 auto; border: 1px solid #ddd; padding: 5px; border-radius: 8px; background-color: #f9f9f9; display: flex; align-items: center; justify-content: center;">
+                            <img id="pos_imagen_preview" src="" alt="Foto del producto" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                        </div>
+                        
+                        <div id="pos_miniaturas_container" style="display: flex; gap: 5px; justify-content: center; margin-top: 8px;">
+                            </div>
                     </div>
+
                 </div>
 
-                <div class="pago-caja">
+                <div class="pago-caja" style="margin-top: 15px;">
                     <div class="total-display">
                         <span>TOTAL A PAGAR</span>
                         <h3 id="pos_total">S/ 0.00</h3>
@@ -43,7 +58,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn-vender">
+                <button type="submit" class="btn-vender" style="margin-top: 15px; width: 100%;">
                     <i class="fa-solid fa-check-to-slot"></i> Finalizar Venta
                 </button>
             </form>
