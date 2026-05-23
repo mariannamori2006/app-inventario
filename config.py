@@ -7,7 +7,7 @@ def get_db_connection():
             user="root",      # Usuario por defecto de XAMPP
             password="",      # Contraseña por defecto (vacía)
             database="InventarioIA",
-            port=3306
+            port=3307
         )
         return conexion
     except mysql.connector.Error as err:

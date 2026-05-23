@@ -12,7 +12,7 @@ def get_db_connection():
             user='root',           # Usuario por defecto de XAMPP
             password='',           # Contraseña por defecto (vía vacía)
             database='InventarioIA', # El nombre exacto de tu BD en el SQL
-            port=3306
+            port=3307
         )
 
         if connection.is_connected():
