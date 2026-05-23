@@ -6,8 +6,13 @@
     <div class="pos-wrapper">
         <div class="card">
             <form id="formVenta">
-                <div style="display: flex; gap: 20px; align-items: flex-start; wrap: nowrap;">
+                <!-- TRUCO PARA EL JS: Guardamos el rol del usuario -->
+                <div id="user_rol_oculto" style="display: none;">{{ session.get('rol', 'Vendedor') }}</div>
+
+                <!-- CONTENEDOR PADRE: flex-start hace que se peguen arriba sin estirarse -->
+                <div style="display: flex; gap: 30px; align-items: flex-start; flex-wrap: nowrap;">
                     
+                    <!-- COLUMNA IZQUIERDA (50%): Entradas de texto -->
                     <div style="flex: 1;">
                         <div class="form-group buscador-container">
                             <label><i class="fa-solid fa-magnifying-glass"></i> Buscar Producto</label>
@@ -30,18 +35,41 @@
                         </div>
                     </div>
 
-                    <div id="bloque_pos_imagen" style="width: 160px; display: none; flex-shrink: 0; text-align: center;">
-                        <div style="width: 140px; height: 140px; margin: 0 auto; border: 1px solid #ddd; padding: 5px; border-radius: 8px; background-color: #f9f9f9; display: flex; align-items: center; justify-content: center;">
+                    <!-- COLUMNA DERECHA (50%): PANEL DE CONFIRMACIÓN -->
+                    <!-- Le quitamos el height:100% y le pusimos un margin-top: 15px para que baje un poquito nada más -->
+                    <div id="bloque_pos_imagen" style="flex: 1; display: none; flex-shrink: 0; background-color: rgba(255,255,255,0.03); border: 1px solid #333; border-radius: 12px; padding: 15px; flex-direction: column; justify-content: flex-start; align-items: center; text-align: center; margin-top: 15px; height: max-content;">
+                        
+                        <!-- Imagen Principal -->
+                        <div style="width: 100%; max-width: 260px; height: 220px; border: 1px solid #444; padding: 10px; border-radius: 8px; background-color: #fff; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); margin-bottom: 12px;">
                             <img id="pos_imagen_preview" src="" alt="Foto del producto" style="max-width: 100%; max-height: 100%; object-fit: contain;">
                         </div>
                         
-                        <div id="pos_miniaturas_container" style="display: flex; gap: 5px; justify-content: center; margin-top: 8px;">
+                        <!-- Nombre del Producto -->
+                        <h4 id="pos_info_nombre" style="margin: 5px 0; color: #fff; font-size: 1.1rem; font-weight: 600;">-</h4>
+                        
+                        <!-- Ficha de Datos Dinámicos -->
+                        <div style="display: flex; flex-direction: column; gap: 5px; margin-top: 5px; width: 100%; justify-content: center; align-items: center;">
+                            
+                            <!-- Fila General: Categoría -->
+                            <span style="font-size: 0.9rem; color: var(--text-muted);">Categoría: <strong id="pos_info_categoria" style="color: #fff;">-</strong></span>
+                            
+                            <!-- Fila Exclusiva (Oculta por defecto): Stock y Riesgo -->
+                            <div id="pos_info_restringido" style="display: none; gap: 15px; font-size: 0.9rem; align-items: center; justify-content: center; margin-top: 3px;">
+                                <span style="color: var(--text-muted);">Stock Disp: <strong id="pos_info_stock" style="color: #fff;">-</strong></span>
+                                
+                                <!-- Indicador de Riesgo -->
+                                <span style="color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                                    Riesgo: 
+                                    <span id="pos_riesgo_circulo" style="width: 12px; height: 12px; border-radius: 50%; display: inline-block;"></span>
+                                </span>
                             </div>
+                        </div>
                     </div>
 
                 </div>
 
-                <div class="pago-caja" style="margin-top: 15px;">
+                <!-- Caja de Pago -->
+                <div class="pago-caja" style="margin-top: 20px;">
                     <div class="total-display">
                         <span>TOTAL A PAGAR</span>
                         <h3 id="pos_total">S/ 0.00</h3>
