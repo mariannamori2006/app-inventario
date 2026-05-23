@@ -167,13 +167,44 @@ document.getElementById('formEdicionRapida').addEventListener('submit', async (e
             cerrarModal();
             await cargarProductosMemoria(); 
             renderizarCatalogo(); 
-            alert("✅ " + result.message);
-            
+            // 1. REEMPLAZO DEL ALERT DE ÉXITO ("✅ " + result.message)
+            Swal.fire({
+                title: '¡Éxito!',
+                text: result.message,
+                icon: 'success',
+                background: '#1a1a2d',
+                color: '#ffffff',
+                confirmButtonColor: '#20c997',
+                confirmButtonText: '<i class="fa-solid fa-check"></i> Aceptar',
+                iconColor: '#20c997',
+                borderRadius: '12px'
+            });
+
         } else {
-            alert("❌ " + result.message);
+            // 2. REEMPLAZO DEL ALERT DE ERROR CONTROLADO ("❌ " + result.message)
+            Swal.fire({
+                title: '¡Aviso!',
+                text: result.message,
+                icon: 'warning',
+                background: '#1a1a2d',
+                color: '#ffffff',
+                confirmButtonColor: '#ff9800', // Naranja para advertencias
+                confirmButtonText: 'Entendido',
+                borderRadius: '12px'
+            });
         }
     } catch (error) { 
-        alert("Fallo de conexión con el servidor.");
+        // 3. REEMPLAZO DEL ALERT DE FALLO DE CONEXIÓN ("Fallo de conexión con el servidor.")
+        Swal.fire({
+            title: '¡Error de conexión!',
+            text: 'Fallo de conexión con el servidor. Revisa tu red.',
+            icon: 'error',
+            background: '#1a1a2d',
+            color: '#ffffff',
+            confirmButtonColor: '#e74c3c', // Rojo para errores críticos
+            confirmButtonText: 'Cerrar',
+            borderRadius: '12px'
+        });
     }
 });
 
