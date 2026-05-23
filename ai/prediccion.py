@@ -113,7 +113,7 @@ def analizar_ventas_ia():
         margen_pct = round((margen_sol / precio_compra) * 100, 1) if precio_compra > 0 else 0
 
         score = 100
-        if dias_restantes < 5:      score -= 40
+        if dias_restantes < 5:      score -= 50
         elif dias_restantes < 15:   score -= 25
         elif dias_restantes < 30:   score -= 10
 

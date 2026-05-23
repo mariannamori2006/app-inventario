@@ -59,7 +59,7 @@ window.ejecutarIA = async function() {
             const scores  = result.data.map(p => p.score_salud);
             const colores = scores.map(s => 
                 s >= 70 ? 'rgba(16,185,129,0.8)' : 
-                s >= 40 ? 'rgba(245,158,11,0.8)' : 
+                s >= 55 ? 'rgba(245,158,11,0.8)' : 
                           'rgba(239,68,68,0.8)'
             );
             chartComparativa = new Chart(ctxComp.getContext('2d'), {
@@ -198,7 +198,7 @@ window.abrirPanelIA = function(index) {
 
     let colorScore;
     if (p.score_salud >= 70)      colorScore = '#10b981';
-    else if (p.score_salud >= 40) colorScore = '#f59e0b';
+    else if (p.score_salud >= 55) colorScore = '#f59e0b';
     else                          colorScore = '#ef4444';
 
     document.getElementById('panel_titulo').textContent = p.producto;
