@@ -16,11 +16,11 @@ app.register_blueprint(inventario_bp)
 # -------------------------------------------------------------------
 @app.route('/')
 def home():
-    # Si el usuario ya está logueado, lo mandamos directo al dashboard
+    # usuario logueado redirige al inventario
     if 'user_id' in session:
         return redirect(url_for('inventario.index'))
     
-    # Si no tiene sesión activa, lo rebotamos a la pantalla de login
+    # Si no tiene sesión activa, retorna a la pantalla de login
     return redirect(url_for('usuarios.login'))
 
 # -------------------------------------------------------------------

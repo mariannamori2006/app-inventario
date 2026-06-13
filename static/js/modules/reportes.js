@@ -26,7 +26,7 @@ window.cargarReportes = async function() {
                     </tr>
                 `).join('');
 
-            // 3. Gráfico (Opcional si habilitaste datos de 7 días)
+            // 3. Gráfico 
             if(data.grafico_dias) dibujarGrafico(data.grafico_dias);
         }
     } catch (error) { console.error("Error reportes:", error); }
